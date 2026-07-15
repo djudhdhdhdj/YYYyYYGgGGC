@@ -24,9 +24,10 @@ jobs:
 
           Restart-Service -Name TermService -Force
 
-      - name: Create RDP User with Fixed Password
+      - name: Create RDP User with Strong Password
         run: |
-          $password = "RDP@123456!"
+          # Strong password - Windows policy compliant
+          $password = "RDP@Pass123!"
           $securePass = ConvertTo-SecureString $password -AsPlainText -Force
           
           # Pehle se user hai toh delete karo
@@ -82,7 +83,7 @@ jobs:
           Write-Host "========================================"
           Write-Host "Address: $env:TAILSCALE_IP"
           Write-Host "Username: RDP"
-          Write-Host "Password: RDP@123456!"
+          Write-Host "Password: RDP@Pass123!"
           Write-Host "========================================`n"
 
       - name: Keep Alive
@@ -90,5 +91,5 @@ jobs:
           while ($true) {
               Write-Host "[$(Get-Date)] RDP Active"
               Start-Sleep -Seconds 300
- 
+  
           }
