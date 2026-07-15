@@ -24,30 +24,17 @@ jobs:
 
           Restart-Service -Name TermService -Force
 
-      - name: Create RDP User with Strong Password
+      - name: Set Default User Password
         run: |
-          # Strong password - Windows policy compliant
-          $password = "RDP@Pass123!"
+          # Default user ka password set karo
+          $password = "Runner@123456!"
           $securePass = ConvertTo-SecureString $password -AsPlainText -Force
           
-          # Pehle se user hai toh delete karo
-          Remove-LocalUser -Name "RDP" -ErrorAction SilentlyContinue
-          Start-Sleep -Seconds 2
+          # Default user ka password change karo
+          Set-LocalUser -Name "runneradmin" -Password $securePass -PasswordNeverExpires:$true
+          Add-LocalGroupMember -Group "Remote Desktop Users" -Member "runneradmin" -ErrorAction SilentlyContinue
           
-          # Naya user banao
-          New-LocalUser -Name "RDP" -Password $securePass -AccountNeverExpires -PasswordNeverExpires
-          Add-LocalGroupMember -Group "Administrators" -Member "RDP"
-          Add-LocalGroupMember -Group "Remote Desktop Users" -Member "RDP"
-          
-          # Verify karo
-          $user = Get-LocalUser -Name "RDP"
-          if ($user) {
-              Write-Host "User RDP created successfully!"
-              Write-Host "Password: $password"
-          } else {
-              Write-Error "User creation failed!"
-              exit 1
-          }
+          Write-Host "Password set for runneradmin"
 
       - name: Install Tailscale
         run: |
@@ -82,8 +69,8 @@ jobs:
           Write-Host "RDP ACCESS DETAILS"
           Write-Host "========================================"
           Write-Host "Address: $env:TAILSCALE_IP"
-          Write-Host "Username: RDP"
-          Write-Host "Password: RDP@Pass123!"
+          Write-Host "Username: runneradmin"
+          Write-Host "Password: Runner@123456!"
           Write-Host "========================================`n"
 
       - name: Keep Alive
@@ -91,5 +78,5 @@ jobs:
           while ($true) {
               Write-Host "[$(Get-Date)] RDP Active"
               Start-Sleep -Seconds 300
-  
+ 
           }
